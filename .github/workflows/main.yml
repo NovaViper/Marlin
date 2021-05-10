@@ -1,0 +1,27 @@
+name: Build PlatformIO
+on: push
+
+jobs:
+  main:
+    name: Main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Setup Python
+        uses: actions/setup-python@master
+        with:
+          python-version: '3.x'
+      - name: Install Platform IO
+        run: |
+          python -m pip install --upgrade pip
+          pip install -U platformio
+      - name: Build
+        run: platformio run -e BIGTREE_SKR_PRO
+      - name: Failure Notification
+        uses: "ShaunLWM/action-join@master"
+        env:
+          JOIN_API_KEY: ${{ secrets.JOIN_API_KEY }}
+          JOIN_DEVICE_ID: ${{ secrets.JOIN_DEVICE_ID }}
+          JOIN_TITLE: "Build Failed"
+          JOIN_TEXT: "Your project failed! Check logs"
+        if: failure()
